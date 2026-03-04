@@ -1,4 +1,4 @@
-# CellMigrationLab Docs Hub
+# [Welcome to CellMigrationLab Docs Hub](https://github.com/CellMigrationLab/docs-hub)
 
 Welcome to **docs-hub**, the central documentation repository for **CellMigrationLab**.
 
