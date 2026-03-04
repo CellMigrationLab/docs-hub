@@ -1,0 +1,45 @@
+name: Generate Glossary
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  generate-glossary:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Generate glossary
+        run: |
+          {
+            echo "## Glossary"
+            echo ""
+            find docs -name "*.md" -type f ! -name "README.md" | sort | while read file; do
+              title=$(head -n 1 "$file" | sed 's/^# //')
+              relative_path="${file#docs/}"
+              echo "- [$title]($relative_path)"
+            done
+          } > /tmp/glossary.txt
+      
+      - name: Update README
+        run: |
+          if grep -q "## Glossary" docs/README.md; then
+            sed -i '/## Glossary/,/^## /!b;/^## /!d;r /tmp/glossary.txt' docs/README.md
+          else
+            cat /tmp/glossary.txt >> docs/README.md
+          fi
+      
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/README.md
+          git commit -m "chore: update glossary" || echo "No changes to commit"
+          git push
